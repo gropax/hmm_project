@@ -1,5 +1,7 @@
-import os
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+import os
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'data')
 TIGER_CORPUS = os.path.join(DATA_DIR, 'german_tiger_train.conll')
