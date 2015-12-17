@@ -57,19 +57,23 @@ class Tagger:
             for prev in prevs:
                 prev_normal = prev_freqs[prev] + len(cats) * smooth
                 self.transitions[prev][cat] = (self.transitions[prev][cat] + smooth) / prev_normal
-                #print("P(%s|%s) = %f" % (cat, ",".join(prev), self.transitions[prev][cat]))
+                print("P(%s|%s) = %f" % (cat, ",".join(prev), self.transitions[prev][cat]))
 
             words = self.emissions.keys()
             for word in words:
                 if word == 'STOP': continue
                 word_normal = tag_freqs[cat] + len(words) * smooth
                 self.emissions[word][cat] = (self.emissions[word][cat] + smooth) / word_normal
-                #print("P(%s|%s) = %f" % (word, cat, self.emissions[word][cat]))
+                print("P(%s|%s) = %f" % (word, cat, self.emissions[word][cat]))
 
 
 def main():
-    tagger = Tagger(order=3)
-    corpus = [[("Le", "DET"), ("chat", "N"), ("dort", "V")], [("Le", "DET"), ("chien", "N"), ("noir", "A"), ("mange", "V")]]
+    tagger = Tagger(order=1)
+    corpus = [[("Le", "DET"), ("chat", "N"), ("dort", "V")],
+              [("Le", "DET"), ("chien", "N"), ("noir", "A"), ("mange", "V")],
+              [("Un", "DET"), ("lapin", "N"), ("féroce", "A"), ("mange", "V"), ("des", "DET"), ("humains", "N")],
+              [("Ma", "DET"), ("fille", "N"), ("attardée", "A"), ("est", "V"), ("une", "DET"), ("vraie", "A"), ("merveille", "N")],
+              [("La", "DET"), ("reine", "N"), ("de", "PREP"), ("Narnia", "N"), ("est", "V"), ("horrible", "A")]]
     tagger.train(corpus)
 
 if __name__ == '__main__':
