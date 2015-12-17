@@ -10,7 +10,6 @@ from collections import defaultdict
 import numpy as np
 
 START = ('START', 'START')
-STOP = ('STOP', 'STOP')
 
 
 class Tagger:
@@ -31,7 +30,7 @@ class Tagger:
     def words(self, sent, order=0):
         o = order or self.order
 
-        s = [START]*o + sent + [STOP]
+        s = [START]*o + sent
         wx = []
         for i, w in enumerate(s[o:]):
             prev = tuple(p[1] for p in s[i:i+o])
@@ -66,12 +65,13 @@ class Tagger:
 
             words = self.emissions.keys()
             for word in words:
-                if word == 'STOP': continue
                 word_normal = tag_freqs[cat] + len(words) * smooth
                 self.emissions[word][cat] = (self.emissions[word][cat] + smooth) / word_normal
                 #print("P(%s|%s) = %f" % (word, cat, self.emissions[word][cat]))
 				
     def predict(self, sentence):
+    
+        print(self.transitions)
     
         print("hello")
         words = sentence.split()
@@ -101,7 +101,9 @@ class Tagger:
                 
                 if self.emissions[word][tag] == 0:
                     self.emissions[word][tag] = float(1/len(self.liste_cat))
-                
+                if self.transitions[prev][tag] == 0:
+                    self.transitions[prev][tag] = float(1/(len(self.liste_cat)^self.order))
+
                 print("on a word = " + word + " et tag = " + tag + " et prev = " + str(prev))
                 print("emission vaut : " + str(self.emissions[word][tag]))
                 print("transition vaut : " + str(self.transitions[prev][tag]))
@@ -126,41 +128,7 @@ class Tagger:
                 if tag == y[i] :
                     acc += 1
         return acc / tot
-				
-    def viterbi(self, transitions, emissions):
-        
-        n_classes = len(self.tags)   # n_classes est le nombre de tags différents
-        n_words = len(emissions)     # n_words est la longueur de la phrase
-        
-        # scores devra contenir les poids de chemins dans le graphe
-        scores = np.zeros((n_classes, n_words), dtype = float) - np.inf     
-        # backtrack sert à stocker les chemins
-        backtrack = np.zeros((n_classes, n_words), dtype = int) - 1
-        
-        # pour chaque mot de la phrase
-        for i in range(1, n_words) :
-            # pour chaque tag possible
-            for j,tag in enumerate(self.tags) :
-                
-                # scorage de toutes les arêtes entrantes
-                scores_tag = [emissions[i][tag] + scores[iprev][i-1] + transitions[tag][prev_tag] for iprev,prev_tag in enumerate(self.tags)]
-                # détermination du meilleur prédécesseur
-                best_idx,best_score = max(enumerate(scores_tag), key = lambda x : x[1])
-                # mise à jour du score de l'état
-                scores[j,i] = best_score
-                # lien vers son prédecesseur
-                backtrack[j,i] = best_idx
-        
-        # détermination du meilleur puis de la meilleure séquence de tags
-        sequence = np.zeros(n_words, dtype=int) -1
-        sequence[-1] = np.argmax(scores[:,-1])
-        for i in reversed(range(n_words-1)) :
-            sequence[i] = backtrack[sequence[i+1], i+1]
-        return [self.tags[i] for i in sequence]
 
-    #def confMatrix(train_mat, pred_mat):
-
-		
 		
 
 def main():
