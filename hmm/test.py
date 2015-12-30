@@ -38,6 +38,7 @@ class Tagger:
 
         return wx
 
+# entraine sur un corpus pour remplir les tableaux emissions et transitions
     def train(self, corpus, smooth=1e-5):
         tag_freqs = defaultdict(float)
         prev_freqs = defaultdict(float)
@@ -68,12 +69,14 @@ class Tagger:
                 word_normal = tag_freqs[cat] + len(words) * smooth
                 self.emissions[word][cat] = (self.emissions[word][cat] + smooth) / word_normal
                 #print("P(%s|%s) = %f" % (word, cat, self.emissions[word][cat]))
-				
+
+
+# utilise les tableaux remplis dans train pour prédire les catégories des mots de sentence
     def predict(self, sentence):
     
-        print(self.transitions)
+        #print(self.transitions)
     
-        print("hello")
+        #print("hello")
         words = sentence.split()
         list_tags_prev = []
         for i in range(self.order):
@@ -88,21 +91,22 @@ class Tagger:
             prev_liste = []
             for indice in range(1, self.order + 1):
                 blabla = j - indice
-                print(blabla)
-                print(list_tags_prev[blabla])
+                #print(blabla)
+                #print(list_tags_prev[blabla])
                 prev_liste.append(list_tags_prev[j-indice])
             prev_inverse = tuple(prev_liste)
             prev = prev_inverse[::-1]
+            print
             print(prev)
             max = 0
             cat_max = ""
             for tag in self.liste_cat:
                 
                 
-                if self.emissions[word][tag] == 0:
-                    self.emissions[word][tag] = float(1/len(self.liste_cat))
-                if self.transitions[prev][tag] == 0:
-                    self.transitions[prev][tag] = float(1/(len(self.liste_cat)^self.order))
+                if self.emissions[word][tag] == 0.0:
+                    self.emissions[word][tag] = float(1)/float(len(self.liste_cat))
+                if self.transitions[prev][tag] == 0.0:
+                    self.transitions[prev][tag] = float(1)/float((len(self.liste_cat)**self.order))
 
                 print("on a word = " + word + " et tag = " + tag + " et prev = " + str(prev))
                 print("emission vaut : " + str(self.emissions[word][tag]))
@@ -110,7 +114,8 @@ class Tagger:
 
 
                 score = self.emissions[word][tag] * self.transitions[prev][tag]
-                if score > max:
+                if score >= max:
+                    print("cette cat est + probable que les précédentes")
                     max = score
                     cat_max = tag
             list_tags_prev.append(cat_max)
@@ -118,7 +123,7 @@ class Tagger:
 
 		
     def evalTagger(self, sentences_lst):
-        print("hello")
+        #print("hello")
         acc = 0.0
         tot = 0.0
         for x,y in sentences_lst :
@@ -133,13 +138,23 @@ class Tagger:
 
 def main():
     tagger = Tagger(order=3)
-    corpus_train = [[("Le", "DET"), ("chat", "N"), ("dort", "V")], [("Le", "DET"), ("chien", "N"), ("noir", "A"), ("mange", "V")], [("La", "DET"), ("chatte", "N"), ("grise", "A"), ("boit", "V"), ("son", "DET"), ("lait", "N")]]
-    sentence = ("Le chat noir mange le chien noir")
-    bon_result = ["START", "START", "START", "DET", "N", "A", "V", "DET", "N", "A"]
+    corpus_train = [[("Le", "DET"), ("chat", "N"), ("dort", "V")], [("Une", "DET"), ("chatte", "N"), ("boit", "V"), ("le", "DET"), ("lait", "N")], [("Mes", "DET"), ("souris", "N"), ("courent", "V")], [("Le", "DET"), ("chien", "N"), ("noir", "A"), ("mange", "V")], [("La", "DET"), ("chatte", "N"), ("grise", "A"), ("boit", "V"), ("son", "DET"), ("lait", "N")]]
+    
+    sentence1 = ("Le chat noir mange le chien noir")
+    sentence2 = ("Des enfants nourrissent le chien")
+    
+    bon_result1 = ["START", "START", "START", "DET", "N", "A", "V", "DET", "N", "A"]
+    bon_result2 = ["START", "START", "START", "DET", "N", "V", "DET", "N"]
+    
     tagger.train(corpus_train)
-    if tagger.predict(sentence) == bon_result :
-        print("YOUHOU")
+    result1 = tagger.predict(sentence1)
+    result2 = tagger.predict(sentence2)
 
+    print
+    if result1 == bon_result1 :
+        print("Phrase 1 correctement prédite")
+    if result2 == bon_result2 :
+        print("Phrase 2 correctement prédite")
 
 if __name__ == '__main__':
     main()
