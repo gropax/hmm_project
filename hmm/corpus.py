@@ -5,6 +5,7 @@ import os
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'data')
 TIGER_CORPUS = os.path.join(DATA_DIR, 'german_tiger_train.conll')
+TIGER_TEST = os.path.join(DATA_DIR, 'german_tiger_test.conll')
 TIGER_UNIV_TAGS = os.path.join(DATA_DIR, 'de_tiger.map')
 
 

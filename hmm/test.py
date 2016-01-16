@@ -7,6 +7,10 @@
 # V1
 
 from collections import defaultdict
+# On importe tout ce qui est dans corpus
+
+from corpus import *
+
 import numpy as np
 
 START = ('START', 'START')
@@ -74,17 +78,17 @@ class Tagger:
 # utilise les tableaux remplis dans train pour prédire les catégories des mots de sentence
     def predict(self, sentence):
     
-        #print(self.transitions)
-    
-        #print("hello")
-        words = sentence.split()
+        # En fait avec le corpus German Tiger c'est déjà une liste, pas besoin de faire de spilt
+        """words = sentence.split()"""
+        words = sentence
+        
         list_tags_prev = []
+        
         for i in range(self.order):
             words = ["START"] + words
             list_tags_prev.append("START")
-        print(words)
-        print(list_tags_prev)
         
+        print(words)
         
         for i, word in enumerate(words[self.order:]):
             j = i + self.order
@@ -96,8 +100,8 @@ class Tagger:
                 prev_liste.append(list_tags_prev[j-indice])
             prev_inverse = tuple(prev_liste)
             prev = prev_inverse[::-1]
-            print
-            print(prev)
+            
+   
             max = 0
             cat_max = ""
             for tag in self.liste_cat:
@@ -107,15 +111,18 @@ class Tagger:
                     self.emissions[word][tag] = float(1)/float(len(self.liste_cat))
                 if self.transitions[prev][tag] == 0.0:
                     self.transitions[prev][tag] = float(1)/float((len(self.liste_cat)**self.order))
-
+                """
                 print("on a word = " + word + " et tag = " + tag + " et prev = " + str(prev))
+                
+                print(word)
+                
                 print("emission vaut : " + str(self.emissions[word][tag]))
                 print("transition vaut : " + str(self.transitions[prev][tag]))
-
+                """
 
                 score = self.emissions[word][tag] * self.transitions[prev][tag]
                 if score >= max:
-                    print("cette cat est + probable que les précédentes")
+                    #print("cette cat est + probable que les précédentes")
                     max = score
                     cat_max = tag
             list_tags_prev.append(cat_max)
@@ -123,7 +130,6 @@ class Tagger:
 
 		
     def evalTagger(self, sentences_lst):
-        #print("hello")
         acc = 0.0
         tot = 0.0
         for x,y in sentences_lst :
@@ -137,8 +143,37 @@ class Tagger:
 		
 
 def main():
+    
+    # L'hmm utilisé avec un corpus
     tagger = Tagger(order=3)
+    tiger_train = ConllCorpus(TIGER_CORPUS)
+    tagger.train(tiger_train)
+    
+    """
+    print("La liste des cats est:")
+    print(tagger.liste_cat)
+    
+    print("Le tableau des emissions est:")
+    print(tagger.emissions)
+    
+    print("Le tableau des transitions est:")
+    print(tagger.transitions)
+    
+    tiger_test = ConllCorpus(TIGER_TEST)
+    for i in tiger_test:
+        #print("Pour :")
+        #print(i)
+        print("La prédiction est :")
+        print(tagger.predict(i))
+    
+    """
+    
+    
+    # Petit corpus créé de toutes pièces pour tester l'HMM
+    """
     corpus_train = [[("Le", "DET"), ("chat", "N"), ("dort", "V")], [("Une", "DET"), ("chatte", "N"), ("boit", "V"), ("le", "DET"), ("lait", "N")], [("Mes", "DET"), ("souris", "N"), ("courent", "V")], [("Le", "DET"), ("chien", "N"), ("noir", "A"), ("mange", "V")], [("La", "DET"), ("chatte", "N"), ("grise", "A"), ("boit", "V"), ("son", "DET"), ("lait", "N")]]
+    
+    
     
     sentence1 = ("Le chat noir mange le chien noir")
     sentence2 = ("Des enfants nourrissent le chien")
@@ -155,6 +190,7 @@ def main():
         print("Phrase 1 correctement prédite")
     if result2 == bon_result2 :
         print("Phrase 2 correctement prédite")
+    """
 
 if __name__ == '__main__':
     main()
