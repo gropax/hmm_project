@@ -88,9 +88,10 @@ class Tagger:
             words = ["START"] + words
             list_tags_prev.append("START")
         
-        print(words)
+        #print(words)
         
         for i, word in enumerate(words[self.order:]):
+            #print(word)
             j = i + self.order
             prev_liste = []
             for indice in range(1, self.order + 1):
@@ -140,13 +141,38 @@ class Tagger:
                     acc += 1
         return acc / tot
 
-		
+
+    def evalTagger_2(self, corpus_test):
+        acc = 0.0
+        tot = 0.0
+
+        for i in corpus_test:
+            liste_mot = []
+            liste_cat = []
+            for x in i:
+                liste_mot.append(x[0])
+                liste_cat.append(x[1])
+            tot += len(liste_cat)
+            print("On devrait avoir :")
+            print(liste_cat)
+            liste_cats_predites = self.predict(liste_mot)
+            liste_sans_start = liste_cats_predites[self.order:]
+            print("On a")
+            print(liste_sans_start)
+
+            for j in range(len(liste_cat)):
+                if liste_sans_start[j] == liste_cat[j]:
+                    acc += 1
+            
+        return acc / tot
 
 def main():
     
     # L'hmm utilisé avec un corpus
     tagger = Tagger(order=3)
     tiger_train = ConllCorpus(TIGER_CORPUS)
+    
+    
     tagger.train(tiger_train)
     
     """
@@ -158,15 +184,30 @@ def main():
     
     print("Le tableau des transitions est:")
     print(tagger.transitions)
+    """
     
     tiger_test = ConllCorpus(TIGER_TEST)
-    for i in tiger_test:
-        #print("Pour :")
-        #print(i)
-        print("La prédiction est :")
-        print(tagger.predict(i))
-    
+    print(tagger.evalTagger_2(tiger_test))
     """
+    sentences_lst = []
+    for i in tiger_test:
+        print(tagger.evalTagger_2(i))
+    """
+    #print(tagger.evalTagger(sentences_lst))
+    """
+    for i in tiger_test:
+        print("Pour :")
+        liste_mots = []
+        liste_cat_reelles = []
+        for mot in i:
+            liste_mots.append(mot[0])
+            liste_cat_reelles.append(mot[1])
+        print(liste_cat_reelles)
+        print("La prédiction est :")
+        print(tagger.predict(liste_mots))
+
+    """
+    
     
     
     # Petit corpus créé de toutes pièces pour tester l'HMM
