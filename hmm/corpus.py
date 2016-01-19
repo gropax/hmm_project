@@ -28,13 +28,13 @@ class ConllCorpus:
 
 
 class TigerCorpus(ConllCorpus):
-    def __init__(self):
-        super().__init__(TIGER_CORPUS)
+    def __init__(self, corpus):
+        super().__init__(corpus)
 
 
 class UnivTigerCorpus(TigerCorpus):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, corpus):
+        super().__init__(corpus)
         self.fetch_tags()
 
     def __iter__(self):
