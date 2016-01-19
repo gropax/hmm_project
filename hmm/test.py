@@ -191,7 +191,6 @@ def main():
     tagger1 = Tagger(order=1)
     
     tiger_train = ConllCorpus(TIGER_CORPUS)
-<<<<<<< Updated upstream
     tiger_test = ConllCorpus(TIGER_TEST)
     smooth=1e-5
     
