@@ -9,7 +9,7 @@ TIGER_TEST = os.path.join(DATA_DIR, 'german_tiger_test.conll')
 TIGER_UNIV_TAGS = os.path.join(DATA_DIR, 'de_tiger.map')
 
 
-class ConllCorpus:
+class ConllCorpus(object):
     def __init__(self, path):
         self.path = path
 
@@ -29,16 +29,16 @@ class ConllCorpus:
 
 class TigerCorpus(ConllCorpus):
     def __init__(self, corpus):
-        super().__init__(corpus)
+        super(TigerCorpus, self).__init__(corpus)
 
 
 class UnivTigerCorpus(TigerCorpus):
     def __init__(self, corpus):
-        super().__init__(corpus)
+        super(UnivTigerCorpus, self).__init__(corpus)
         self.fetch_tags()
 
     def __iter__(self):
-        for sent in super().__iter__():
+        for sent in super(UnivTigerCorpus, self).__iter__():
             yield [(w, self.tags[t]) for w, t in sent]
 
     def fetch_tags(self):
